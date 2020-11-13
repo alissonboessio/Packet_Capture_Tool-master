@@ -140,7 +140,8 @@ namespace Packet_Capture_Tool
             device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
 
             int readTimeoutMilliseconds = 1000;
-            if (isPromisc == true) {
+            if (isPromisc == true)
+            {
                 device.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
             }
             else
@@ -193,97 +194,117 @@ namespace Packet_Capture_Tool
         private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
         {
             Packet pack = Packet.ParsePacket(packet.Packet.LinkLayerType, packet.Packet.Data);
-            TcpPacket tcpPacket = (TcpPacket) pack.Extract(typeof(TcpPacket));
-
             DateTime time = packet.Packet.Timeval.Date;
-            int len = packet.Packet.Data.Length;            
+            int len = packet.Packet.Data.Length;
 
-            if (tcpPacket != null)
+            if (IsTCPPacket(pack))
             {
-                IpPacket ipPacket = (IpPacket) tcpPacket.ParentPacket;
-
-                var packageDetail = new PackageDetail(tcpPacket, null, ipPacket);
-                packageDetailList.Add(packageDetail);
-
-                var srcIp = ipPacket.SourceAddress;
-                var dstIp = ipPacket.DestinationAddress;
-                var srcPort = tcpPacket.SourcePort;
-                var dstPort = tcpPacket.DestinationPort;
-                writeLine = string.Format("ID: {9} - {0}:{1}:{2},{3} - TCP Packet: {5}:{6}  -> {7}:{8}\n\n",
-                                    time.Hour, time.Minute, time.Second, time.Millisecond, len,
-                                    srcIp, srcPort, dstIp, dstPort, packageDetail.Id);
-                Invoke(new MethodInvoker(updateLog));
+                ShowTCPPacket(pack, time, len);
             }
-            else
+            else if (IsUDPPacket(pack))
+            {
+                ShowUDPPacket(pack, time, len);
+            }
+            else if (IsICMPv4Packet(pack))
             {
 
-                UdpPacket udpPacket = (UdpPacket) pack.Extract(typeof(UdpPacket));
-                time = packet.Packet.Timeval.Date;
-                len = packet.Packet.Data.Length;
-                if (udpPacket != null)
-                {
+            }
+            else if (IsICMPv6Packet(pack))
+            {
 
-                    IpPacket ipPacket = (IpPacket)udpPacket.ParentPacket;
-
-                    var packageDetail = new PackageDetail(null, udpPacket, ipPacket);
-                    packageDetailList.Add(packageDetail);
-
-                    IPAddress srcIp = ipPacket.SourceAddress;
-                    IPAddress dstIp = ipPacket.DestinationAddress;
-                    ushort srcPort = udpPacket.SourcePort;
-                    ushort dstPort = udpPacket.DestinationPort;
-                    writeLine = (string.Format("ID: {9} - {0}:{1}:{2},{3} - UDP Packet: {5}:{6} -> {7}:{8}\n",
-                                    time.Hour, time.Minute, time.Second, time.Millisecond, len,
-                                    srcIp, srcPort, dstIp, dstPort, packageDetail.Id));
-                    Invoke(new MethodInvoker(updateLog));
-                    if (decodeMode == true)
-                    {
-                        byte[] packetBytes = udpPacket.PayloadData;
-                        int version = SnmpPacket.GetProtocolVersion(packetBytes, packetBytes.Length);
-                        switch(version)
-                        {
-                            case (int)SnmpVersion.Ver1:
-                                SnmpV1Packet snmpPacket = new SnmpV1Packet();
-                                try
-                                {
-                                    snmpPacket.decode(packetBytes, packetBytes.Length);
-                                    writeLine = "SNMP.V1 Packet: " + snmpPacket.ToString();
-                                }
-                                catch (Exception e)
-                                {
-                                    writeLine = e.ToString();
-                                }
-                                break;
-                            case (int)SnmpVersion.Ver2:
-                                SnmpV2Packet snmp2Packet = new SnmpV2Packet();
-                                try
-                                {
-                                    snmp2Packet.decode(packetBytes, packetBytes.Length);
-                                    writeLine = "SNMP.V2 Packet: " + snmp2Packet.ToString();
-                                }
-                                catch (Exception e)
-                                {
-                                    writeLine = e.ToString();
-                                }
-                                break;
-                            case (int)SnmpVersion.Ver3:
-                                SnmpV3Packet snmp3Packet = new SnmpV3Packet();
-                                try
-                                {
-                                    snmp3Packet.decode(packetBytes, packetBytes.Length);
-                                    writeLine = "SNMP.V3 Packet: " + snmp3Packet.ToString();
-                                }
-                                catch (Exception e)
-                                {
-                                    writeLine = e.ToString();
-                                }
-                                break;
-                        }
-                        Invoke(new MethodInvoker(updateLog));
-                    }
-                }
             }
         }
+
+
+        #region TCP
+        private bool IsTCPPacket(Packet pack) => (TcpPacket)pack.Extract(typeof(TcpPacket)) != null;
+        private void ShowTCPPacket(Packet pack, DateTime time, int len)
+        {
+            var tcpPacket = (TcpPacket)pack.Extract(typeof(TcpPacket));
+            IpPacket ipPacket = (IpPacket)tcpPacket.ParentPacket;
+
+            var packageDetail = new PackageDetail(tcpPacket, null, ipPacket);
+            packageDetailList.Add(packageDetail);
+
+            var srcIp = ipPacket.SourceAddress;
+            var dstIp = ipPacket.DestinationAddress;
+            var srcPort = tcpPacket.SourcePort;
+            var dstPort = tcpPacket.DestinationPort;
+            writeLine = string.Format("ID: {9} - {0}:{1}:{2},{3} - TCP Packet: {5}:{6}  -> {7}:{8}\n\n",
+                                time.Hour, time.Minute, time.Second, time.Millisecond, len,
+                                srcIp, srcPort, dstIp, dstPort, packageDetail.Id);
+            Invoke(new MethodInvoker(updateLog));
+        }
+        #endregion
+
+        #region UDP
+        private bool IsUDPPacket(Packet pack) => (UdpPacket)pack.Extract(typeof(UdpPacket)) != null;
+        private void ShowUDPPacket(Packet pack, DateTime time, int len)
+        {
+            UdpPacket udpPacket = (UdpPacket)pack.Extract(typeof(UdpPacket));
+            IpPacket ipPacket = (IpPacket)udpPacket.ParentPacket;
+
+            var packageDetail = new PackageDetail(null, udpPacket, ipPacket);
+            packageDetailList.Add(packageDetail);
+
+            IPAddress srcIp = ipPacket.SourceAddress;
+            IPAddress dstIp = ipPacket.DestinationAddress;
+            ushort srcPort = udpPacket.SourcePort;
+            ushort dstPort = udpPacket.DestinationPort;
+            writeLine = (string.Format("ID: {9} - {0}:{1}:{2},{3} - UDP Packet: {5}:{6} -> {7}:{8}\n",
+                            time.Hour, time.Minute, time.Second, time.Millisecond, len,
+                            srcIp, srcPort, dstIp, dstPort, packageDetail.Id));
+            Invoke(new MethodInvoker(updateLog));
+            if (decodeMode == true)
+            {
+                byte[] packetBytes = udpPacket.PayloadData;
+                int version = SnmpPacket.GetProtocolVersion(packetBytes, packetBytes.Length);
+                switch (version)
+                {
+                    case (int)SnmpVersion.Ver1:
+                        SnmpV1Packet snmpPacket = new SnmpV1Packet();
+                        try
+                        {
+                            snmpPacket.decode(packetBytes, packetBytes.Length);
+                            writeLine = "SNMP.V1 Packet: " + snmpPacket.ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            writeLine = e.ToString();
+                        }
+                        break;
+                    case (int)SnmpVersion.Ver2:
+                        SnmpV2Packet snmp2Packet = new SnmpV2Packet();
+                        try
+                        {
+                            snmp2Packet.decode(packetBytes, packetBytes.Length);
+                            writeLine = "SNMP.V2 Packet: " + snmp2Packet.ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            writeLine = e.ToString();
+                        }
+                        break;
+                    case (int)SnmpVersion.Ver3:
+                        SnmpV3Packet snmp3Packet = new SnmpV3Packet();
+                        try
+                        {
+                            snmp3Packet.decode(packetBytes, packetBytes.Length);
+                            writeLine = "SNMP.V3 Packet: " + snmp3Packet.ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            writeLine = e.ToString();
+                        }
+                        break;
+                }
+                Invoke(new MethodInvoker(updateLog));
+            }
+        }
+        #endregion
+
+        private bool IsICMPv4Packet(Packet pack) => (ICMPv4Packet)pack.Extract(typeof(ICMPv4Packet)) != null;
+        private bool IsICMPv6Packet(Packet pack) => (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet)) != null;
 
         private void label1_Click(object sender, EventArgs e)
         {
