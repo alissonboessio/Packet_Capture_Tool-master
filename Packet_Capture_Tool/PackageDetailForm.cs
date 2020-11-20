@@ -77,6 +77,17 @@ namespace Packet_Capture_Tool
 
                 windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
             }
+            else if(package.ICMPv4Packet != null)
+            {
+                packageType.Text = "ICMPv4 PACKET";
+                headerText.Text += SetHeader(package.ICMPv4Packet.Header);
+
+                checksumText.Text += package.ICMPv4Packet.Checksum.ToString();
+
+                sourceAndDestinationText.Text += SetAddress(package.IpPacket, package.ICMPv4Packet);
+
+                windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
+            }
         }
 
         private string BooleanToString(bool isTrue, int returnStringType = 0)
