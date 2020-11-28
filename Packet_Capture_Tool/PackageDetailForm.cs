@@ -88,6 +88,17 @@ namespace Packet_Capture_Tool
 
                 windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
             }
+            else if(package.ICMPv6Packet != null)
+            {
+                packageType.Text = "ICMPv6 PACKET";
+                headerText.Text += SetHeader(package.ICMPv6Packet.Header);
+
+                checksumText.Text += package.ICMPv6Packet.Checksum.ToString();
+
+                sourceAndDestinationText.Text += SetAddress(package.IpPacket, package.ICMPv6Packet);
+
+                windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
+            }
         }
 
         private string BooleanToString(bool isTrue, int returnStringType = 0)
@@ -136,6 +147,11 @@ namespace Packet_Capture_Tool
             acknowledgmentNumberText.Text = "Acknowledgment Number: ";
             dataOffsetText.Text = "Data Offset: ";
             flagsText.Text = "--------------------------------------------------------------------------------------> FLAGS <--------------------------------------------------------------------------------------";
+        }
+
+        private void PackageDetailForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

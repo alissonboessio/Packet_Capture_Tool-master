@@ -211,7 +211,7 @@ namespace Packet_Capture_Tool
             }
             else if (IsICMPv6Packet(pack))
             {
-
+                ShowICMPv6Packet(pack, time, len);
             }
         }
 
@@ -303,6 +303,7 @@ namespace Packet_Capture_Tool
         }
         #endregion
 
+        #region ICMPv4
         private bool IsICMPv4Packet(Packet pack) => (ICMPv4Packet)pack.Extract(typeof(ICMPv4Packet)) != null;
 
         private void ShowICMPv4Packet(Packet pack, DateTime time, int len)
@@ -320,9 +321,27 @@ namespace Packet_Capture_Tool
                                 srcIp, dstIp, packageDetail.Id);
             Invoke(new MethodInvoker(updateLog));
         }
+        #endregion
 
+        #region ICMPv6
         private bool IsICMPv6Packet(Packet pack) => (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet)) != null;
 
+        private void ShowICMPv6Packet(Packet pack, DateTime time, int len)
+        {
+            var icmpv6Packet = (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet));
+            IpPacket ipPacket = (IpPacket)icmpv6Packet.ParentPacket;
+
+            var packageDetail = new PackageDetail(icmpv6Packet, ipPacket);
+            packageDetailList.Add(packageDetail);
+
+            var srcIp = ipPacket.SourceAddress;
+            var dstIp = ipPacket.DestinationAddress;
+            writeLine = string.Format("ID: {7} - {0}:{1}:{2},{3} - ICMPv4 Packet: {5} -> {6}\n\n",
+                                time.Hour, time.Minute, time.Second, time.Millisecond, len,
+                                srcIp, dstIp, packageDetail.Id);
+            Invoke(new MethodInvoker(updateLog));
+        }
+        #endregion
         private void label1_Click(object sender, EventArgs e)
         {
 
