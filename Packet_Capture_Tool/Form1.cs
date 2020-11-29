@@ -127,6 +127,24 @@ namespace Packet_Capture_Tool
             button3.Enabled = false;
             button4.Enabled = false;
         }
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            typeOfDecode = 3;
+            button3.Enabled = false;
+            button4.Enabled = false;
+        }
+        private void radioButton5_CheckedChanged(object sender, EventArgs e)
+        {
+            typeOfDecode = 4;
+            button3.Enabled = false;
+            button4.Enabled = false;
+        }
+        private void radioButton6_CheckedChanged(object sender, EventArgs e)
+        {
+            typeOfDecode = 5;
+            button3.Enabled = false;
+            button4.Enabled = false;
+        }
 
         private void updateLog()
         {
@@ -167,13 +185,25 @@ namespace Packet_Capture_Tool
                         filter = "ip and tcp";
                         device.Filter = filter;
                         break;
+                    case 3:
+                        filter = "ip and icmp";
+                        device.Filter = filter;
+                        break;
+                    case 4:
+                        filter = "icmpv6";
+                        device.Filter = filter;
+                        break;
+                    case 5:
+                        filter = "ip and igmp";
+                        device.Filter = filter;
+                        break;
                 }
             }
-            else
-            {
-                filter = "udp port 161 or udp port 162";
-                device.Filter = filter;
-            }
+            //else
+            //{
+            //    filter = "udp port 161 or udp port 162";
+            //    device.Filter = filter;
+            //}
 
             device.StartCapture();
             writeLine = "--- Listening For Packets ---";
@@ -193,7 +223,14 @@ namespace Packet_Capture_Tool
 
         private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
         {
+            var A = 0;
             Packet pack = Packet.ParsePacket(packet.Packet.LinkLayerType, packet.Packet.Data);
+            if (pack.ToString() == null || pack.ToString().Contains("IGMP"))
+                A = 1;
+
+            writeLine = $"Log: {pack}";
+            Invoke(new MethodInvoker(updateLog));
+
             DateTime time = packet.Packet.Timeval.Date;
             int len = packet.Packet.Data.Length;
 
@@ -213,11 +250,15 @@ namespace Packet_Capture_Tool
             {
                 ShowICMPv6Packet(pack, time, len);
             }
+            else if(IsIGMPv2Packet(pack))
+            {
+                ShowIGMPv2Packet(pack, time, len);
+            }
         }
 
 
         #region TCP
-        private bool IsTCPPacket(Packet pack) => (TcpPacket)pack.Extract(typeof(TcpPacket)) != null;
+        public bool IsTCPPacket(Packet pack) => (TcpPacket)pack.Extract(typeof(TcpPacket)) != null;
         private void ShowTCPPacket(Packet pack, DateTime time, int len)
         {
             var tcpPacket = (TcpPacket)pack.Extract(typeof(TcpPacket));
@@ -238,7 +279,7 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region UDP
-        private bool IsUDPPacket(Packet pack) => (UdpPacket)pack.Extract(typeof(UdpPacket)) != null;
+        public bool IsUDPPacket(Packet pack) => (UdpPacket)pack.Extract(typeof(UdpPacket)) != null;
         private void ShowUDPPacket(Packet pack, DateTime time, int len)
         {
             UdpPacket udpPacket = (UdpPacket)pack.Extract(typeof(UdpPacket));
@@ -304,7 +345,7 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region ICMPv4
-        private bool IsICMPv4Packet(Packet pack) => (ICMPv4Packet)pack.Extract(typeof(ICMPv4Packet)) != null;
+        public bool IsICMPv4Packet(Packet pack) => (ICMPv4Packet)pack.Extract(typeof(ICMPv4Packet)) != null;
 
         private void ShowICMPv4Packet(Packet pack, DateTime time, int len)
         {
@@ -324,7 +365,7 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region ICMPv6
-        private bool IsICMPv6Packet(Packet pack) => (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet)) != null;
+        public bool IsICMPv6Packet(Packet pack) => (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet)) != null;
 
         private void ShowICMPv6Packet(Packet pack, DateTime time, int len)
         {
@@ -336,11 +377,32 @@ namespace Packet_Capture_Tool
 
             var srcIp = ipPacket.SourceAddress;
             var dstIp = ipPacket.DestinationAddress;
-            writeLine = string.Format("ID: {7} - {0}:{1}:{2},{3} - ICMPv4 Packet: {5} -> {6}\n\n",
+            writeLine = string.Format("ID: {7} - {0}:{1}:{2},{3} - ICMPv6 Packet: {5} -> {6}\n\n",
                                 time.Hour, time.Minute, time.Second, time.Millisecond, len,
                                 srcIp, dstIp, packageDetail.Id);
             Invoke(new MethodInvoker(updateLog));
         }
+        #endregion
+
+        #region IGMP
+        public bool IsIGMPv2Packet(Packet pack) => (IGMPv2Packet)pack.Extract(typeof(IGMPv2Packet)) != null;
+
+        private void ShowIGMPv2Packet(Packet pack, DateTime time, int len)
+        {
+            var igmpv2Packet = (IGMPv2Packet)pack.Extract(typeof(IGMPv2Packet));
+            IpPacket ipPacket = (IpPacket)igmpv2Packet.ParentPacket;
+
+            var packageDetail = new PackageDetail(igmpv2Packet, ipPacket);
+            packageDetailList.Add(packageDetail);
+
+            var srcIp = ipPacket.SourceAddress;
+            var dstIp = ipPacket.DestinationAddress;
+            writeLine = string.Format("ID: {7} - {0}:{1}:{2},{3} - IGMPv2 Packet: {5} -> {6}\n\n",
+                                time.Hour, time.Minute, time.Second, time.Millisecond, len,
+                                srcIp, dstIp, packageDetail.Id);
+            Invoke(new MethodInvoker(updateLog));
+        }
+
         #endregion
         private void label1_Click(object sender, EventArgs e)
         {
@@ -361,5 +423,7 @@ namespace Packet_Capture_Tool
         {
             new PackageDetailForm(packageDetailList).Show();
         }
+
+        
     }
 }

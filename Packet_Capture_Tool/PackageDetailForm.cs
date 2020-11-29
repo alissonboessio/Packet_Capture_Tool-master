@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,6 +100,17 @@ namespace Packet_Capture_Tool
 
                 windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
             }
+            else if (package.IGMPv2Packet != null)
+            {
+                packageType.Text = "IGMPv2 PACKET";
+                headerText.Text += SetHeader(package.IGMPv2Packet.Header);
+
+                checksumText.Text += package.IGMPv2Packet.Checksum.ToString();
+
+                sourceAndDestinationText.Text += SetAddress(package.IpPacket, package.IGMPv2Packet);
+
+                windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
+            }
         }
 
         private string BooleanToString(bool isTrue, int returnStringType = 0)
@@ -132,9 +144,17 @@ namespace Packet_Capture_Tool
 
         private string SetAddress(IpPacket ip, dynamic package)
         {
-            return  ip.SourceAddress.ToString() + ":" + package.SourcePort.ToString()
-                    + " -> Destination: " + ip.DestinationAddress.ToString() + ":" + package.DestinationPort.ToString()
+            var sourcePort = ExistsPortNumber(package) ? $":{package.SourcePort.ToString()}" : string.Empty;
+            var destinationPort = ExistsPortNumber(package) ? $":{package.DestinationPort.ToString()}" : string.Empty;
+            return  ip.SourceAddress.ToString() + sourcePort
+                    + " -> Destination: " + ip.DestinationAddress.ToString() + destinationPort
                     + " - IP Version: " + ip.Version; ;
+        }
+
+        private bool ExistsPortNumber(dynamic pack)
+        {
+            var form = new Form1();
+            return form.IsTCPPacket(pack) || form.IsUDPPacket(pack);
         }
 
         private void ClearScreen()

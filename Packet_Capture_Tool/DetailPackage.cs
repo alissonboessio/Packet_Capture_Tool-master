@@ -12,6 +12,7 @@ namespace Packet_Capture_Tool
         public TcpPacket TcpPacket { get; private set; }
         public ICMPv4Packet ICMPv4Packet { get; private set; }
         public ICMPv6Packet ICMPv6Packet { get; private set; }
+        public IGMPv2Packet IGMPv2Packet { get; private set; }
 
         public IpPacket IpPacket { get; private set; }
 
@@ -40,6 +41,12 @@ namespace Packet_Capture_Tool
         {
             Id = Interlocked.Increment(ref _newId);
             ICMPv6Packet = iCMPv6Packet;
+            IpPacket = ipPacket;
+        }
+        public PackageDetail(IGMPv2Packet iGMPv2Packet, IpPacket ipPacket)
+        {
+            Id = Interlocked.Increment(ref _newId);
+            IGMPv2Packet = iGMPv2Packet;
             IpPacket = ipPacket;
         }
 
