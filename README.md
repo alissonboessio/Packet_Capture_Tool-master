@@ -1,7 +1,8 @@
 # Packet Capture Tool
 
 ## Objective
-- Software for capturing TCP and UDP packets created by JamesE-J and added the details of the packets by me.<br/>
+- Software for capturing TCP and UDP packets created by JamesE-J and Bruno Caregnato. 
+- This project added the capture of ICMPv4, ICMPv6 and IGMPv2 packets<br/>
 ![Tool](Images/home_screen.png?raw=true "Tool")
 
 ## How to Use
@@ -13,3 +14,9 @@
 ![Tcp detail](Images/tcp_detail.png?raw=true "Tcp detail")<br/>
 ### UDP PACKAGE DETAIL EXAMPLE
 ![Udp detail](Images/udp_detail.png?raw=true "Udp detail")<br/>
+### ICMPv4 PACKAGE DETAIL EXAMPLE
+![ICMPv4 detail](Images/icmpv4_detail.png?raw=true "ICMPv4 detail")<br/>
+### ICMPv6 PACKAGE DETAIL EXAMPLE
+![ICMPv6 detail](Images/icmpv6_detail.png?raw=true "ICMPv6 detail")<br/>
+### IGMPv2 PACKAGE DETAIL EXAMPLE
+![IGMPv2 detail](Images/igmpv2_detail.png?raw=true "IGMPv2 detail")<br/>
