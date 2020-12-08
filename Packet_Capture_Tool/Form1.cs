@@ -74,6 +74,7 @@ namespace Packet_Capture_Tool
 
         private void button1_Click(object sender, EventArgs e)
         {
+            packageDetailList.Clear();
             deviceIndex = int.Parse(comboBox1.Text);
             isPromisc = checkBox1.Checked;
             decodeMode = false;
@@ -190,7 +191,7 @@ namespace Packet_Capture_Tool
                         device.Filter = filter;
                         break;
                     case 4:
-                        filter = "icmpv6";
+                        filter = "icmp6";
                         device.Filter = filter;
                         break;
                     case 5:
@@ -223,14 +224,7 @@ namespace Packet_Capture_Tool
 
         private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
         {
-            var A = 0;
             Packet pack = Packet.ParsePacket(packet.Packet.LinkLayerType, packet.Packet.Data);
-            if (pack.ToString() == null || pack.ToString().Contains("IGMP"))
-                A = 1;
-
-            writeLine = $"Log: {pack}";
-            Invoke(new MethodInvoker(updateLog));
-
             DateTime time = packet.Packet.Timeval.Date;
             int len = packet.Packet.Data.Length;
 
@@ -424,6 +418,9 @@ namespace Packet_Capture_Tool
             new PackageDetailForm(packageDetailList).Show();
         }
 
-        
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
