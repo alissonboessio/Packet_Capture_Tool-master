@@ -5,6 +5,12 @@
 - This project added the capture of ICMPv4, ICMPv6 and IGMPv2 packets<br/>
 ![Tool](Images/home_screen.png?raw=true "Tool")
 
+## Usage 
+- Remove the currently installed npcap driver
+- Install version 0.991 (https://nmap.org/npcap/dist/npcap-0.991.exe)
+- Add wpcap.dll (Packet_Capture_Tool\dll) in Packet_Capture_Tool\bin\Debug
+- Run project
+
 ## How to Use
 - It is possible to carry out the capture of UDP, TCP, ICMPv4, ICMPv6 and IGMPv2 packets, the screen on the side will show the captured packets and an id.<br/>
 ![Capturing Packages](Images/capturing_packages.png?raw=true "Capturing Packages")
