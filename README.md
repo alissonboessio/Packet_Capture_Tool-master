@@ -6,7 +6,7 @@
 ![Tool](Images/home_screen.png?raw=true "Tool")
 
 ## How to Use
-- It is possible to carry out the capture of UDP and TCP packets, the screen on the side will show the captured packets and an id.<br/>
+- It is possible to carry out the capture of UDP, TCP, ICMPv4, ICMPv6 and IGMPv2 packets, the screen on the side will show the captured packets and an id.<br/>
 ![Capturing Packages](Images/capturing_packages.png?raw=true "Capturing Packages")
 
 - In the button of detailing package, it is possible to put the requested package ID, showing its details:<br/>
