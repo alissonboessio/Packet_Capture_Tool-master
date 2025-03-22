@@ -47,7 +47,7 @@ namespace Packet_Capture_Tool
             if (package.TcpPacket != null)
             {
                 packageType.Text = "TCP PACKET";
-                headerText.Text += SetHeader(package.TcpPacket.Header);
+                headerText.Text += SetHeader(package.TcpPacket.HeaderData);
 
                 checksumText.Text += package.TcpPacket.Checksum.ToString() + " - is " + BooleanToString(package.TcpPacket.ValidChecksum, 1); 
                 windowsSizeText.Text += package.TcpPacket.WindowSize.ToString();
@@ -57,20 +57,20 @@ namespace Packet_Capture_Tool
 
                 sourceAndDestinationText.Text += SetAddress(package.IpPacket, package.TcpPacket);
 
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.CWR) + " -> Congestion Window Reduced (CWR)";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.ECN) + " -> ECN-Echo";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Urg) + " -> Urgent";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Ack) + " -> Acknowledgment";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Psh) + " -> Push";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Rst) + " -> Reset";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Syn) + " -> Syn";
-                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Fin) + " -> Fin";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.CongestionWindowReduced) + " -> Congestion Window Reduced (CWR)";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.ExplicitCongestionNotificationEcho) + " -> ECN-Echo";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Urgent) + " -> Urgent";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Acknowledgment) + " -> Acknowledgment";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Push) + " -> Push";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Reset) + " -> Reset";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Synchronize) + " -> Syn";
+                flagsText.Text += "\n" + BooleanToString(package.TcpPacket.Finished) + " -> Fin";
 
             }
             else if(package.UdpPacket != null)
             {
                 packageType.Text = "UDP PACKET";
-                headerText.Text += SetHeader(package.UdpPacket.Header);
+                headerText.Text += SetHeader(package.UdpPacket.HeaderData);
                 
                 checksumText.Text += package.UdpPacket.Checksum.ToString() + " - is " + BooleanToString(package.UdpPacket.ValidChecksum, 1);
 
@@ -81,7 +81,7 @@ namespace Packet_Capture_Tool
             else if(package.ICMPv4Packet != null)
             {
                 packageType.Text = "ICMPv4 PACKET";
-                headerText.Text += SetHeader(package.ICMPv4Packet.Header);
+                headerText.Text += SetHeader(package.ICMPv4Packet.HeaderData);
 
                 checksumText.Text += package.ICMPv4Packet.Checksum.ToString();
 
@@ -92,7 +92,7 @@ namespace Packet_Capture_Tool
             else if(package.ICMPv6Packet != null)
             {
                 packageType.Text = "ICMPv6 PACKET";
-                headerText.Text += SetHeader(package.ICMPv6Packet.Header);
+                headerText.Text += SetHeader(package.ICMPv6Packet.HeaderData);
 
                 checksumText.Text += package.ICMPv6Packet.Checksum.ToString();
 
@@ -103,7 +103,7 @@ namespace Packet_Capture_Tool
             else if (package.IGMPv2Packet != null)
             {
                 packageType.Text = "IGMPv2 PACKET";
-                headerText.Text += SetHeader(package.IGMPv2Packet.Header);
+                headerText.Text += SetHeader(package.IGMPv2Packet.HeaderData);
 
                 checksumText.Text += package.IGMPv2Packet.Checksum.ToString();
 
@@ -142,7 +142,7 @@ namespace Packet_Capture_Tool
             return headerText;
         }
 
-        private string SetAddress(IpPacket ip, dynamic package)
+        private string SetAddress(IPPacket ip, dynamic package)
         {
             var sourcePort = ExistsPortNumber(package) ? $":{package.SourcePort.ToString()}" : string.Empty;
             var destinationPort = ExistsPortNumber(package) ? $":{package.DestinationPort.ToString()}" : string.Empty;

@@ -51,7 +51,7 @@ namespace Packet_Capture_Tool
         private string get_Device_List()
         {
             captureDeviceList = new List<string>();
-            var ver = SharpPcap.Version.VersionString;
+            var ver = SharpPcap.Pcap.Version.ToString();
             var stringDevices = "SharpPcap {0}, Example1.IfList.cs" + ver;
             devices = CaptureDeviceList.Instance;
             if (devices.Count < 1)
@@ -161,11 +161,11 @@ namespace Packet_Capture_Tool
             int readTimeoutMilliseconds = 1000;
             if (isPromisc == true)
             {
-                device.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
+                device.Open(DeviceModes.Promiscuous, readTimeoutMilliseconds);
             }
             else
             {
-                device.Open(DeviceMode.Normal, readTimeoutMilliseconds);
+                device.Open(DeviceModes.None, readTimeoutMilliseconds);
             }
 
             string filter;
@@ -222,11 +222,11 @@ namespace Packet_Capture_Tool
             stopCapture = false;
         }
 
-        private void device_OnPacketArrival(object sender, CaptureEventArgs packet)
+        private void device_OnPacketArrival(object sender, PacketCapture packet)
         {
-            Packet pack = Packet.ParsePacket(packet.Packet.LinkLayerType, packet.Packet.Data);
-            DateTime time = packet.Packet.Timeval.Date;
-            int len = packet.Packet.Data.Length;
+            Packet pack = Packet.ParsePacket(packet.GetPacket().LinkLayerType, packet.Data.ToArray());
+            DateTime time = packet.GetPacket().Timeval.Date;
+            int len = packet.Data.Length;
 
             if (IsTCPPacket(pack))
             {
@@ -236,9 +236,9 @@ namespace Packet_Capture_Tool
             {
                 ShowUDPPacket(pack, time, len);
             }
-            else if (IsICMPv4Packet(pack))
+            else if (IsIcmpV4Packet(pack))
             {
-                ShowICMPv4Packet(pack, time, len);
+                ShowIcmpV4Packet(pack, time, len);
             }
             else if (IsICMPv6Packet(pack))
             {
@@ -252,11 +252,11 @@ namespace Packet_Capture_Tool
 
 
         #region TCP
-        public bool IsTCPPacket(Packet pack) => (TcpPacket)pack.Extract(typeof(TcpPacket)) != null;
+        public bool IsTCPPacket(Packet pack) => pack.Extract<TcpPacket>() != null;
         private void ShowTCPPacket(Packet pack, DateTime time, int len)
         {
-            var tcpPacket = (TcpPacket)pack.Extract(typeof(TcpPacket));
-            IpPacket ipPacket = (IpPacket)tcpPacket.ParentPacket;
+            var tcpPacket = pack.Extract<TcpPacket>();
+            IPPacket ipPacket = (IPPacket)tcpPacket.ParentPacket;
 
             var packageDetail = new PackageDetail(tcpPacket, null, ipPacket);
             packageDetailList.Add(packageDetail);
@@ -273,11 +273,11 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region UDP
-        public bool IsUDPPacket(Packet pack) => (UdpPacket)pack.Extract(typeof(UdpPacket)) != null;
+        public bool IsUDPPacket(Packet pack) => pack.Extract<UdpPacket>() != null;
         private void ShowUDPPacket(Packet pack, DateTime time, int len)
         {
-            UdpPacket udpPacket = (UdpPacket)pack.Extract(typeof(UdpPacket));
-            IpPacket ipPacket = (IpPacket)udpPacket.ParentPacket;
+            UdpPacket udpPacket = pack.Extract<UdpPacket>();
+            IPPacket ipPacket = (IPPacket)udpPacket.ParentPacket;
 
             var packageDetail = new PackageDetail(null, udpPacket, ipPacket);
             packageDetailList.Add(packageDetail);
@@ -339,12 +339,12 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region ICMPv4
-        public bool IsICMPv4Packet(Packet pack) => (ICMPv4Packet)pack.Extract(typeof(ICMPv4Packet)) != null;
+        public bool IsIcmpV4Packet(Packet pack) => pack.Extract<IcmpV4Packet>() != null;
 
-        private void ShowICMPv4Packet(Packet pack, DateTime time, int len)
+        private void ShowIcmpV4Packet(Packet pack, DateTime time, int len)
         {
-            var icmpv4Packet = (ICMPv4Packet)pack.Extract(typeof(ICMPv4Packet));
-            IpPacket ipPacket = (IpPacket)icmpv4Packet.ParentPacket;
+            var icmpv4Packet = pack.Extract<IcmpV4Packet>();
+            IPPacket ipPacket = (IPPacket)icmpv4Packet.ParentPacket;
 
             var packageDetail = new PackageDetail(icmpv4Packet, ipPacket);
             packageDetailList.Add(packageDetail);
@@ -359,12 +359,12 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region ICMPv6
-        public bool IsICMPv6Packet(Packet pack) => (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet)) != null;
+        public bool IsICMPv6Packet(Packet pack) => pack.Extract<IcmpV6Packet>() != null;
 
         private void ShowICMPv6Packet(Packet pack, DateTime time, int len)
         {
-            var icmpv6Packet = (ICMPv6Packet)pack.Extract(typeof(ICMPv6Packet));
-            IpPacket ipPacket = (IpPacket)icmpv6Packet.ParentPacket;
+            var icmpv6Packet = pack.Extract<IcmpV6Packet>();
+            IPPacket ipPacket = (IPPacket)icmpv6Packet.ParentPacket;
 
             var packageDetail = new PackageDetail(icmpv6Packet, ipPacket);
             packageDetailList.Add(packageDetail);
@@ -379,12 +379,12 @@ namespace Packet_Capture_Tool
         #endregion
 
         #region IGMP
-        public bool IsIGMPv2Packet(Packet pack) => (IGMPv2Packet)pack.Extract(typeof(IGMPv2Packet)) != null;
+        public bool IsIGMPv2Packet(Packet pack) => pack.Extract<IgmpV2Packet>() != null;
 
         private void ShowIGMPv2Packet(Packet pack, DateTime time, int len)
         {
-            var igmpv2Packet = (IGMPv2Packet)pack.Extract(typeof(IGMPv2Packet));
-            IpPacket ipPacket = (IpPacket)igmpv2Packet.ParentPacket;
+            var igmpv2Packet = pack.Extract<IgmpV2Packet>();
+            IPPacket ipPacket = (IPPacket)igmpv2Packet.ParentPacket;
 
             var packageDetail = new PackageDetail(igmpv2Packet, ipPacket);
             packageDetailList.Add(packageDetail);

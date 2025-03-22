@@ -1,0 +1,48 @@
+# Pastas do Visual Studio
+.vs/
+.idea/
+*.suo
+*.user
+*.vcxproj.user
+*.csproj.user
+*.cache/
+*.obj/
+*.log
+*.tlog
+*.idb
+*.pdb
+*.ilk
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.sqlite
+*.ipch
+*.VC.db
+
+# Build e Debug
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.log
+*.map
+*.cache
+*.ilk
+
+# Dependências do NuGet
+packages/
+*.nupkg
+project.lock.json
+project.assets.json
+.nuget/
+
+# Configuração de Ambiente do Rider/Resharper
+*.DotSettings.user
+.ReSharper*/
+
+# Diretórios temporários
+tmp/
+temp/
