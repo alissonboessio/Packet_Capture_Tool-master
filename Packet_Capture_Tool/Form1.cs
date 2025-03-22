@@ -74,7 +74,6 @@ namespace Packet_Capture_Tool
 
         private void button1_Click(object sender, EventArgs e)
         {
-            packageDetailList.Clear();
             deviceIndex = int.Parse(comboBox1.Text);
             isPromisc = checkBox1.Checked;
             decodeMode = false;
@@ -146,6 +145,12 @@ namespace Packet_Capture_Tool
             button3.Enabled = false;
             button4.Enabled = false;
         }
+        private void radioButton7_CheckedChanged(object sender, EventArgs e)
+        {
+            typeOfDecode = 6;
+            button3.Enabled = false;
+            button4.Enabled = false;
+        }
 
         private void updateLog()
         {
@@ -198,6 +203,10 @@ namespace Packet_Capture_Tool
                         filter = "ip and igmp";
                         device.Filter = filter;
                         break;
+                    case 6:
+                        filter = "arp";
+                        device.Filter = filter;
+                        break;
                 }
             }
             //else
@@ -247,6 +256,10 @@ namespace Packet_Capture_Tool
             else if(IsIGMPv2Packet(pack))
             {
                 ShowIGMPv2Packet(pack, time, len);
+            }
+            else if(IsArpPacket(pack))
+            {
+                ShowArpPacket(pack, time, len);
             }
         }
 
@@ -398,29 +411,42 @@ namespace Packet_Capture_Tool
         }
 
         #endregion
-        private void label1_Click(object sender, EventArgs e)
-        {
+        
+        #region ARP
+        public bool IsArpPacket(Packet pack) => pack.Extract<ArpPacket>() != null;
 
+        private void ShowArpPacket(Packet pack, DateTime time, int len)
+        {
+            var arpPacket = pack.Extract<ArpPacket>();
+
+            var packageDetail = new PackageDetail(arpPacket, null);
+            packageDetailList.Add(packageDetail);
+
+            // Informações do pacote ARP
+            var arpOperation = arpPacket.Operation.ToString();
+            var senderMac = arpPacket.SenderHardwareAddress.ToString();
+            var senderIp = arpPacket.SenderProtocolAddress.ToString();
+            var targetMac = arpPacket.TargetHardwareAddress.ToString();
+            var targetIp = arpPacket.TargetProtocolAddress.ToString();
+
+            // Tamanho do pacote
+            var packetSize = len;
+
+            writeLine = string.Format(
+                "ID: {8} - {0}:{1}:{2},{3} - ARP Packet: Operation = {4} from MAC {5} IP {6} to MAC {7} IP {9}. Size = {10}\n\n",
+                time.Hour, time.Minute, time.Second, time.Millisecond, arpOperation, senderMac, senderIp, targetMac, packageDetail.Id,
+                targetIp, packetSize);
+
+            Invoke(new MethodInvoker(updateLog));
         }
 
-        private void label3_Click(object sender, EventArgs e)
-        {
 
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
 
         private void button5_Click(object sender, EventArgs e)
         {
             new PackageDetailForm(packageDetailList).Show();
         }
 
-        private void button2_Click_1(object sender, EventArgs e)
-        {
-
-        }
     }
 }

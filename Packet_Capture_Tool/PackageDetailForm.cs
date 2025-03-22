@@ -111,6 +111,35 @@ namespace Packet_Capture_Tool
 
                 windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
             }
+            else if (package.ARPPacket != null)
+            {
+                packageType.Text = "ARP PACKET";
+
+                // Exibindo os dados do cabeçalho ARP
+                headerText.Text += SetHeader(package.ARPPacket.HeaderData);
+
+                string fromTo = $" {package.ARPPacket.SenderHardwareAddress} MAC (IP {package.ARPPacket.SenderProtocolAddress})" +
+                    $" To -> {package.ARPPacket.TargetHardwareAddress} MAC (IP {package.ARPPacket.TargetProtocolAddress})";
+
+                sourceAndDestinationText.Text += fromTo;
+
+                checksumText.Text = "Operation: " + package.ARPPacket.Operation.ToString();
+
+                windowsSizeText.Text = sequenceNumberText.Text = acknowledgmentNumberText.Text = dataOffsetText.Text = flagsText.Text = "";
+
+
+                //// Exibindo as informações do pacote ARP
+                //var arpPacket = package.ARPPacket;
+                //senderHardwareAddressText.Text += arpPacket.SenderHardwareAddress.ToString();
+                //senderProtocolAddressText.Text += arpPacket.SenderProtocolAddress.ToString();
+                //targetHardwareAddressText.Text += arpPacket.TargetHardwareAddress.ToString();
+                //targetProtocolAddressText.Text += arpPacket.TargetProtocolAddress.ToString();
+
+                //// Exibindo o tipo de operação ARP (Request ou Reply)
+                //arpOperationText.Text += arpPacket.Operation.ToString();
+
+            }
+
         }
 
         private string BooleanToString(bool isTrue, int returnStringType = 0)

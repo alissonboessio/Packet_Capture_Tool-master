@@ -32,6 +32,7 @@
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label5;
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.radioButton7 = new System.Windows.Forms.RadioButton();
             this.radioButton6 = new System.Windows.Forms.RadioButton();
             this.radioButton5 = new System.Windows.Forms.RadioButton();
             this.radioButton4 = new System.Windows.Forms.RadioButton();
@@ -61,7 +62,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(12, 336);
+            label2.Location = new System.Drawing.Point(12, 357);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(160, 13);
             label2.TabIndex = 6;
@@ -75,12 +76,11 @@
             label1.Size = new System.Drawing.Size(120, 13);
             label1.TabIndex = 3;
             label1.Text = "Choose capture device:";
-            label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(9, 215);
+            label5.Location = new System.Drawing.Point(9, 236);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(95, 13);
             label5.TabIndex = 14;
@@ -95,6 +95,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.radioButton7);
             this.splitContainer1.Panel1.Controls.Add(this.radioButton6);
             this.splitContainer1.Panel1.Controls.Add(this.radioButton5);
             this.splitContainer1.Panel1.Controls.Add(this.radioButton4);
@@ -118,9 +119,20 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.textBox1);
-            this.splitContainer1.Size = new System.Drawing.Size(860, 508);
+            this.splitContainer1.Size = new System.Drawing.Size(860, 522);
             this.splitContainer1.SplitterDistance = 235;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // radioButton7
+            // 
+            this.radioButton7.AutoSize = true;
+            this.radioButton7.Location = new System.Drawing.Point(12, 213);
+            this.radioButton7.Name = "radioButton7";
+            this.radioButton7.Size = new System.Drawing.Size(89, 17);
+            this.radioButton7.TabIndex = 20;
+            this.radioButton7.Text = "ARP Packets";
+            this.radioButton7.UseVisualStyleBackColor = true;
+            this.radioButton7.CheckedChanged += new System.EventHandler(this.radioButton7_CheckedChanged);
             // 
             // radioButton6
             // 
@@ -159,7 +171,7 @@
             // 
             this.button5.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(12, 467);
+            this.button5.Location = new System.Drawing.Point(12, 488);
             this.button5.Name = "button5";
             this.button5.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.button5.Size = new System.Drawing.Size(155, 36);
@@ -172,7 +184,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label6.Location = new System.Drawing.Point(9, 312);
+            this.label6.Location = new System.Drawing.Point(9, 332);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(177, 13);
             this.label6.TabIndex = 15;
@@ -182,29 +194,27 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label4.Location = new System.Drawing.Point(12, 443);
+            this.label4.Location = new System.Drawing.Point(12, 463);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(194, 13);
             this.label4.TabIndex = 13;
             this.label4.Text = "port 161 and from port 162 (SNMP only)";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label3.Location = new System.Drawing.Point(12, 430);
+            this.label3.Location = new System.Drawing.Point(12, 452);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(190, 13);
             this.label3.TabIndex = 12;
             this.label3.Text = "Currently only decodes packets sent to";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // button4
             // 
             this.button4.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button4.Location = new System.Drawing.Point(12, 394);
+            this.button4.Location = new System.Drawing.Point(12, 414);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(155, 36);
             this.button4.TabIndex = 11;
@@ -215,7 +225,7 @@
             // 
             this.button3.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(12, 352);
+            this.button3.Location = new System.Drawing.Point(12, 372);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(155, 36);
             this.button3.TabIndex = 10;
@@ -259,13 +269,12 @@
             // 
             this.button2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(12, 273);
+            this.button2.Location = new System.Drawing.Point(12, 293);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(155, 36);
             this.button2.TabIndex = 5;
             this.button2.Text = "Stop Capture";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click_1);
             // 
             // checkBox1
             // 
@@ -291,7 +300,7 @@
             // 
             this.button1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(12, 231);
+            this.button1.Location = new System.Drawing.Point(12, 251);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(155, 36);
             this.button1.TabIndex = 1;
@@ -300,23 +309,21 @@
             // 
             // textBox1
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.BackColor = System.Drawing.SystemColors.Window;
-            this.textBox1.Location = new System.Drawing.Point(3, 0);
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox1.Location = new System.Drawing.Point(0, 0);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(615, 508);
+            this.textBox1.Size = new System.Drawing.Size(621, 522);
             this.textBox1.TabIndex = 1;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(860, 508);
+            this.ClientSize = new System.Drawing.Size(860, 522);
             this.Controls.Add(this.splitContainer1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -351,6 +358,7 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.RadioButton radioButton5;
         private System.Windows.Forms.RadioButton radioButton6;
+        private System.Windows.Forms.RadioButton radioButton7;
     }
 }
 
