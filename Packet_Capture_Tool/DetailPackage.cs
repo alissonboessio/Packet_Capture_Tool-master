@@ -14,6 +14,7 @@ namespace Packet_Capture_Tool
         public IcmpV6Packet ICMPv6Packet { get; private set; }
         public IgmpV2Packet IGMPv2Packet { get; private set; }
         public ArpPacket ARPPacket { get; private set; }
+        public LldpPacket LLDPPacket { get; private set; }
 
         public IPPacket IpPacket { get; private set; }
 
@@ -54,6 +55,12 @@ namespace Packet_Capture_Tool
         {
             Id = Interlocked.Increment(ref _newId);
             ARPPacket = arpPacket;
+            IpPacket = ipPacket;
+        }
+        public PackageDetail(LldpPacket lldpPacket, IPPacket ipPacket)
+        {
+            Id = Interlocked.Increment(ref _newId);
+            LLDPPacket = lldpPacket;
             IpPacket = ipPacket;
         }
 

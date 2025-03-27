@@ -50,6 +50,7 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.radioButton8 = new System.Windows.Forms.RadioButton();
             label2 = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
             label5 = new System.Windows.Forms.Label();
@@ -95,6 +96,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.radioButton8);
             this.splitContainer1.Panel1.Controls.Add(this.radioButton7);
             this.splitContainer1.Panel1.Controls.Add(this.radioButton6);
             this.splitContainer1.Panel1.Controls.Add(this.radioButton5);
@@ -126,7 +128,7 @@
             // radioButton7
             // 
             this.radioButton7.AutoSize = true;
-            this.radioButton7.Location = new System.Drawing.Point(12, 213);
+            this.radioButton7.Location = new System.Drawing.Point(12, 191);
             this.radioButton7.Name = "radioButton7";
             this.radioButton7.Size = new System.Drawing.Size(89, 17);
             this.radioButton7.TabIndex = 20;
@@ -137,7 +139,7 @@
             // radioButton6
             // 
             this.radioButton6.AutoSize = true;
-            this.radioButton6.Location = new System.Drawing.Point(12, 190);
+            this.radioButton6.Location = new System.Drawing.Point(12, 170);
             this.radioButton6.Name = "radioButton6";
             this.radioButton6.Size = new System.Drawing.Size(106, 17);
             this.radioButton6.TabIndex = 19;
@@ -148,7 +150,7 @@
             // radioButton5
             // 
             this.radioButton5.AutoSize = true;
-            this.radioButton5.Location = new System.Drawing.Point(12, 167);
+            this.radioButton5.Location = new System.Drawing.Point(12, 150);
             this.radioButton5.Name = "radioButton5";
             this.radioButton5.Size = new System.Drawing.Size(105, 17);
             this.radioButton5.TabIndex = 18;
@@ -159,7 +161,7 @@
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(12, 144);
+            this.radioButton4.Location = new System.Drawing.Point(12, 130);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(105, 17);
             this.radioButton4.TabIndex = 17;
@@ -235,7 +237,7 @@
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(12, 121);
+            this.radioButton3.Location = new System.Drawing.Point(12, 110);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(88, 17);
             this.radioButton3.TabIndex = 9;
@@ -246,7 +248,7 @@
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(12, 98);
+            this.radioButton2.Location = new System.Drawing.Point(12, 92);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(90, 17);
             this.radioButton2.TabIndex = 8;
@@ -319,6 +321,16 @@
             this.textBox1.Size = new System.Drawing.Size(621, 522);
             this.textBox1.TabIndex = 1;
             // 
+            // radioButton8
+            // 
+            this.radioButton8.AutoSize = true;
+            this.radioButton8.Location = new System.Drawing.Point(12, 212);
+            this.radioButton8.Name = "radioButton8";
+            this.radioButton8.Size = new System.Drawing.Size(94, 17);
+            this.radioButton8.TabIndex = 21;
+            this.radioButton8.Text = "LLDP Packets";
+            this.radioButton8.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -359,6 +371,7 @@
         private System.Windows.Forms.RadioButton radioButton5;
         private System.Windows.Forms.RadioButton radioButton6;
         private System.Windows.Forms.RadioButton radioButton7;
+        private System.Windows.Forms.RadioButton radioButton8;
     }
 }
 

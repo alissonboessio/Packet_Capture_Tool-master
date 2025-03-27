@@ -13,6 +13,7 @@ using PacketDotNet;
 using Packet_Capture_Tool;
 using System.Net;
 using SnmpSharpNet;
+using PacketDotNet.Lldp;
 
 namespace Packet_Capture_Tool
 {
@@ -151,6 +152,12 @@ namespace Packet_Capture_Tool
             button3.Enabled = false;
             button4.Enabled = false;
         }
+        private void radioButton8_CheckedChanged(object sender, EventArgs e)
+        {
+            typeOfDecode = 7;
+            button3.Enabled = false;
+            button4.Enabled = false;
+        }
 
         private void updateLog()
         {
@@ -207,6 +214,10 @@ namespace Packet_Capture_Tool
                         filter = "arp";
                         device.Filter = filter;
                         break;
+                    case 7:
+                        filter = "lldp";
+                        device.Filter = filter;
+                        break;
                 }
             }
             //else
@@ -260,6 +271,10 @@ namespace Packet_Capture_Tool
             else if(IsArpPacket(pack))
             {
                 ShowArpPacket(pack, time, len);
+            }
+            else if(IsLldpPacket(pack))
+            {
+                ShowLldpPacket(pack, time, len);
             }
         }
 
@@ -442,6 +457,82 @@ namespace Packet_Capture_Tool
 
 
         #endregion
+
+        
+        #region LLDP
+        public bool IsLldpPacket(Packet pack) => pack.Extract<LldpPacket>() != null;
+
+        private void ShowLldpPacket(Packet pack, DateTime time, int len)
+        {
+
+            var chassisId = "N/A";
+            var portId = "N/A";
+            var systemName = "N/A";
+            var systemDesc = "N/A";
+            var sysCapabilities = "N/A";
+            var managementAddr = "N/A";
+
+            var lldpPacket = pack.Extract<LldpPacket>();
+
+            IPPacket ipPacket = (IPPacket)lldpPacket.ParentPacket;
+
+            var packageDetail = new PackageDetail(lldpPacket, ipPacket);
+            packageDetailList.Add(packageDetail);
+            foreach (var tlv in lldpPacket.TlvCollection)
+            {
+                switch (tlv)
+                {
+                    case ChassisIdTlv chassisIdTlv:
+                        chassisId = chassisIdTlv.ToString();
+                        break;
+
+                    case PortIdTlv portIdTlv:
+                        portId = portIdTlv.ToString();
+                        break;
+
+                    case SystemNameTlv systemNameTlv:
+                        systemName = systemNameTlv.ToString();
+                        break;
+
+                    case SystemDescriptionTlv systemDescTlv:
+                        systemDesc = systemDescTlv.ToString();
+                        break;
+
+                    case SystemCapabilitiesTlv sysCapabilitiesTlv:
+                        sysCapabilities = sysCapabilitiesTlv.ToString();
+                        break;
+
+                    case ManagementAddressTlv managementAddrTlv:
+                        managementAddr = managementAddrTlv.ToString();
+                        break;
+
+                    default:
+                        Console.WriteLine($"Unknown TLV Type: {tlv.GetType().Name}");
+                        break;
+                }
+            }
+
+            //var senderMac = lldpPacket.SenderHardwareAddress?.ToString() ?? "N/A";
+            //var senderIp = lldpPacket.SenderProtocolAddress?.ToString() ?? "N/A";
+            //var targetMac = lldpPacket.TargetHardwareAddress?.ToString() ?? "N/A";
+            //var targetIp = lldpPacket.TargetProtocolAddress?.ToString() ?? "N/A";
+
+            var packetSize = len;
+
+            // Sender MAC = {11}, Sender IP = {12}, Target MAC = {13}, Target IP = {14}.
+            writeLine = string.Format(
+                "ID: {8} - {0}:{1}:{2},{3} - LLDP Packet: Chassis ID = {4}, Port ID = {5}, System Name = {6}, Description = {7}, System Capabilities = {9}, Management Address = {10}.\n Size = {11}\n\n",
+                time.Hour, time.Minute, time.Second, time.Millisecond,
+                chassisId, portId, systemName, systemDesc, packageDetail.Id,
+                sysCapabilities, managementAddr, /*senderMac, senderIp, targetMac, targetIp,*/ packetSize);
+
+            Invoke(new MethodInvoker(updateLog));
+        }
+
+
+        #endregion
+
+
 
         private void button5_Click(object sender, EventArgs e)
         {
