@@ -4,6 +4,76 @@
              xmlns:local="clr-namespace:PacketCaptureTool"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Colors.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <SolidColorBrush x:Key="BrushPrimary"
+                 Color="{DynamicResource ColorPrimary}" />
+            <SolidColorBrush x:Key="BrushPrimary01"
+                 Color="{DynamicResource ColorPrimary01}" />
+            <SolidColorBrush x:Key="BrushPrimary02"
+                 Color="{DynamicResource ColorPrimary02}" />
+            <SolidColorBrush x:Key="BrushPrimary03"
+                 Color="{DynamicResource ColorPrimary03}" />
+
+            <Style x:Key="RadioSelectableButton"
+                TargetType="RadioButton">
+                <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+                <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+                <Setter Property="FontSize"
+                    Value="16" />
+                <Setter Property="FontWeight"
+                    Value="Bold" />
+                <Setter Property="BorderThickness"
+                    Value="1" />
+                <Setter Property="BorderBrush"
+                    Value="{StaticResource BrushPrimary}" />
+                <Setter Property="Background"
+                    Value="White" />
+                <Setter Property="Foreground"
+                    Value="{StaticResource BrushPrimary}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border x:Name="border"
+                                Cursor="Hand"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                Margin="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Grid.Column="1"
+                                    Margin="0 0 0 0" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked"
+                                    Value="True">
+                                    <Setter Property="Background"
+                                        Value="{StaticResource BrushPrimary}" />
+                                    <Setter Property="Foreground"
+                                        Value="White" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver"
+                                    Value="True">
+                                    <Setter Property="BorderBrush"
+                                        Value="{StaticResource BrushPrimary02}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
+        
     </Application.Resources>
 </Application>

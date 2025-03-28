@@ -5,11 +5,53 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PacketCaptureTool"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=True}"
         Title="Packet Capture Tool" Height="450" Width="800">
     <Grid x:Name="painel">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="230"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0"
+                    Margin="10">
+            
+            <StackPanel>
+                <Label>Choose device to capture:</Label>
+                <ComboBox>
+                    <ComboBoxItem>Test1</ComboBoxItem>
+                    <ComboBoxItem>Test2</ComboBoxItem>
+                </ComboBox>
+                <CheckBox Margin="0,5,0,0">Promiscuous mode</CheckBox>
+            </StackPanel>
+
+            <StackPanel>
+
+                <Label>Packets:</Label>
+                <ItemsControl ItemsSource="{Binding packetsOptions}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton Style="{StaticResource RadioSelectableButton}"                                         
+                                         IsChecked="{Binding check, UpdateSourceTrigger=PropertyChanged}"
+                                         HorizontalContentAlignment="Center"
+                                         Margin="2"
+                                         Width="100"
+                                         Height="30">
+                                <TextBlock TextWrapping="WrapWithOverflow"
+                                           TextAlignment="Center"
+                                           Text="{Binding description}" />
+                            </RadioButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </StackPanel>
+            
+            
+        </StackPanel>
     </Grid>
 </Window>
