@@ -8,6 +8,13 @@ namespace PacketCaptureTool.Objects
             this.value = value;
             this.description = description;
         }
+        
+        public ValueDescOption(int value, string description, string auxValue)
+        {
+            this.value = value;
+            this.description = description;
+            this.auxValue = auxValue;
+        }
 
         public bool check
         {
@@ -20,6 +27,7 @@ namespace PacketCaptureTool.Objects
         }
         public int value { get => Get<int>(); set => Set(value); }
         public string description { get => Get<string>(); set => Set(value); }
+        public string auxValue { get => Get<string>(); set => Set(value); }
         public Action<ValueDescOption> onCheck { get => Get<Action<ValueDescOption>>(); set => Set(value); }
 
     }

@@ -17,11 +17,14 @@
             
             <StackPanel>
                 <Label>Choose device to capture:</Label>
-                <ComboBox>
-                    <ComboBoxItem>Test1</ComboBoxItem>
-                    <ComboBoxItem>Test2</ComboBoxItem>
+                <ComboBox ItemsSource="{Binding devices}"
+                    SelectedItem="{Binding selectedDevice, Mode=TwoWay}"
+                    DisplayMemberPath="Description"
+                    Margin="10" >
                 </ComboBox>
-                <CheckBox Margin="0,5,0,0">Promiscuous mode</CheckBox>
+
+                <CheckBox Margin="0,5,0,0"
+                          IsChecked="{Binding promiscuosMode}">Promiscuous mode</CheckBox>
             </StackPanel>
 
             <StackPanel>
@@ -50,8 +53,47 @@
                 </ItemsControl>
 
             </StackPanel>
+
+            <Button Margin="0,10,0,0"
+                    Click="Button_Click">
+                Start Capture
+            </Button>
             
             
         </StackPanel>
+        
+        <TabControl Grid.Column="1">
+            <TabItem Header="TCP">
+                <ListView ItemsSource="{Binding TcpPackets}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Src Port" DisplayMemberBinding="{Binding TcpPacket.SourcePort}" />
+                            <GridViewColumn Header="Dst Port" DisplayMemberBinding="{Binding TcpPacket.DestinationPort}" />
+                            <!-- Add more columns -->
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+
+            <TabItem Header="UDP">
+                <ListView ItemsSource="{Binding UdpPackets}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Src Port" DisplayMemberBinding="{Binding UdpPacket.SourcePort}" />
+                            <GridViewColumn Header="Dst Port" DisplayMemberBinding="{Binding UdpPacket.DestinationPort}" />
+                            <!-- Add more columns -->
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+
+            <TabItem Header="ICMPv4">
+                <ListView ItemsSource="{Binding Icmpv4Packets}">
+                    <!-- ICMP columns here -->
+                </ListView>
+            </TabItem>
+
+            <!-- Repeat for ICMPv6, ARP, IGMPv2, LLDP -->
+        </TabControl>
     </Grid>
 </Window>
