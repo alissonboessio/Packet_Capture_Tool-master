@@ -1,0 +1,45 @@
+﻿<Window x:Class="PacketCaptureTool.PacketDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="{Binding TitleText}" 
+        Height="440" Width="630"
+        Background="{StaticResource BrushPrimary01}"
+        Foreground="{StaticResource BrushPrimary}"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{Binding TitleText}" 
+                   FontSize="22" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Left"
+                   Margin="0,0,0,15"
+                   Foreground="White" />
+
+        <Border Grid.Row="1" 
+                Background="White" 
+                CornerRadius="8" 
+                Padding="10"
+                Margin="0,0,0,15"
+                BorderBrush="{StaticResource BrushPrimary}"
+                BorderThickness="1">
+            <ContentControl Content="{Binding MainContent}" />
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="8"
+                Padding="10"
+                BorderBrush="{StaticResource BrushPrimary}"
+                BorderThickness="1">
+            <ContentControl Content="{Binding SecondaryContent}" />
+        </Border>
+    </Grid>
+</Window>

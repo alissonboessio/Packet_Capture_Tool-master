@@ -7,7 +7,7 @@
         xmlns:local1="clr-namespace:PacketCaptureTool.Objects.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="Packet Capture Tool" Height="450" Width="820" MinWidth="820">
+        Title="Packet Capture Tool" Height="600" Width="1000" MinWidth="1000">
     <Window.Resources>
         <local1:BooleanInverterConverter x:Key="BooleanInverterConverter" />
     </Window.Resources>
@@ -303,12 +303,14 @@
 
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Width="auto" Header="ID" DisplayMemberBinding="{Binding LLDPPacket.TlvCollection}" />
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
                                 <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
-                                <!--<GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
-                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
-                                <GridViewColumn Width="70" Header="Source Port" DisplayMemberBinding="{Binding TcpPacket.SourcePort}" />
-                                <GridViewColumn Width="70" Header="Destiny Port" DisplayMemberBinding="{Binding TcpPacket.DestinationPort}" />-->
+                                <GridViewColumn Width="80" Header="Chassis ID" DisplayMemberBinding="{Binding ChassisId}" />
+                                <GridViewColumn Width="100" Header="Port ID" DisplayMemberBinding="{Binding PortId}" />
+                                <GridViewColumn Width="100" Header="System Name" DisplayMemberBinding="{Binding SystemName}" />
+                                <GridViewColumn Width="100" Header="Description" DisplayMemberBinding="{Binding SystemDesc}" />
+                                <GridViewColumn Width="100" Header="Capabilities" DisplayMemberBinding="{Binding SysCapabilities}" />
+                                <GridViewColumn Width="100" Header="Management Address" DisplayMemberBinding="{Binding ManagementAddress}" />
                             </GridView>
                         </ListView.View>
                     </ListView>

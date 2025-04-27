@@ -20,7 +20,10 @@ namespace PacketCaptureTool
                 new(4, "ICMPv6", "icmp6"),
                 new(5, "IGMPv2", "ip and igmp"),
                 new(6, "ARP", "arp"),
-                new(7, "LLDP", "ether proto 0x88cc")
+                new(7, "LLDP", "ether proto 0x88cc"),
+                new(8, "HTTP", "tcp port 80"),
+                new(9, "HTTPS", "tcp port 443"),
+                new(10, "FTP", "tcp port 21"),
             };
 
             this.packetsOptions[0].check = true;
@@ -173,7 +176,7 @@ namespace PacketCaptureTool
                 {
                     if (!string.IsNullOrEmpty(filter))
                     {
-                        filter += $" and {item.auxValue}";
+                        filter += $" or {item.auxValue}";
                     }
                     else
                     {
@@ -206,7 +209,7 @@ namespace PacketCaptureTool
             device.StartCapture();
             while (!stopCapture)
             {
-
+                Thread.Sleep(100);
             }
 
             device.StopCapture();
@@ -269,38 +272,38 @@ namespace PacketCaptureTool
 
             if (IsTCPPacket(pack))
             {
-                ShowTCPPacket(pack, time, len);
+                AddTCPPacket(pack, time, len);
             }
             else if (IsUDPPacket(pack))
             {
-                ShowUDPPacket(pack, time, len);
+                AddUDPPacket(pack, time, len);
             }
             else if (IsIcmpV4Packet(pack))
             {
-                ShowIcmpV4Packet(pack, time, len);
+                AddIcmpV4Packet(pack, time, len);
             }
             else if (IsICMPv6Packet(pack))
             {
-                ShowICMPv6Packet(pack, time, len);
+                AddICMPv6Packet(pack, time, len);
             }
             else if (IsIGMPv2Packet(pack))
             {
-                ShowIGMPv2Packet(pack, time, len);
+                AddIGMPv2Packet(pack, time, len);
             }
             else if (IsArpPacket(pack))
             {
-                ShowArpPacket(pack, time, len);
+                AddArpPacket(pack, time, len);
             }
             else if (IsLldpPacket(pack))
             {
-                ShowLldpPacket(pack, time, len);
+                AddLldpPacket(pack, time, len);
             }
 
         }        
 
         #region TCP
         public bool IsTCPPacket(Packet pack) => pack.Extract<TcpPacket>() != null;
-        private void ShowTCPPacket(Packet pack, DateTime time, int len)
+        private void AddTCPPacket(Packet pack, DateTime time, int len)
         {
             var tcpPacket = pack.Extract<TcpPacket>();
             IPPacket ipPacket = (IPPacket)tcpPacket.ParentPacket;
@@ -315,7 +318,7 @@ namespace PacketCaptureTool
 
         #region UDP
         public bool IsUDPPacket(Packet pack) => pack.Extract<UdpPacket>() != null;
-        private void ShowUDPPacket(Packet pack, DateTime time, int len)
+        private void AddUDPPacket(Packet pack, DateTime time, int len)
         {
             var udpPacket = pack.Extract<UdpPacket>();
             IPPacket ipPacket = (IPPacket)udpPacket.ParentPacket;
@@ -330,7 +333,7 @@ namespace PacketCaptureTool
 
         #region ICMPv4
         public bool IsIcmpV4Packet(Packet pack) => pack.Extract<IcmpV4Packet>() != null;
-        private void ShowIcmpV4Packet(Packet pack, DateTime time, int len)
+        private void AddIcmpV4Packet(Packet pack, DateTime time, int len)
         {
             var icmpv4Packet = pack.Extract<IcmpV4Packet>();
             IPPacket ipPacket = (IPPacket)icmpv4Packet.ParentPacket;
@@ -345,7 +348,7 @@ namespace PacketCaptureTool
 
         #region ICMPv6
         public bool IsICMPv6Packet(Packet pack) => pack.Extract<IcmpV6Packet>() != null;
-        private void ShowICMPv6Packet(Packet pack, DateTime time, int len)
+        private void AddICMPv6Packet(Packet pack, DateTime time, int len)
         {
             var icmpv6Packet = pack.Extract<IcmpV6Packet>();
             IPPacket ipPacket = (IPPacket)icmpv6Packet.ParentPacket;
@@ -360,7 +363,7 @@ namespace PacketCaptureTool
 
         #region IGMP
         public bool IsIGMPv2Packet(Packet pack) => pack.Extract<IgmpV2Packet>() != null;
-        private void ShowIGMPv2Packet(Packet pack, DateTime time, int len)
+        private void AddIGMPv2Packet(Packet pack, DateTime time, int len)
         {
             var igmpv2Packet = pack.Extract<IgmpV2Packet>();
             IPPacket ipPacket = (IPPacket)igmpv2Packet.ParentPacket;
@@ -376,7 +379,7 @@ namespace PacketCaptureTool
         #region ARP
         public bool IsArpPacket(Packet pack) => pack.Extract<ArpPacket>() != null;
 
-        private void ShowArpPacket(Packet pack, DateTime time, int len)
+        private void AddArpPacket(Packet pack, DateTime time, int len)
         {
             var arpPacket = pack.Extract<ArpPacket>();
 
@@ -388,10 +391,10 @@ namespace PacketCaptureTool
         }
         #endregion
 
-        #region region LLDP
+        #region LLDP
         public bool IsLldpPacket(Packet pack) => pack.Extract<LldpPacket>() != null;
 
-        private void ShowLldpPacket(Packet pack, DateTime time, int len)
+        private void AddLldpPacket(Packet pack, DateTime time, int len)
         {
             var lldpPacket = pack.Extract<LldpPacket>();
 
@@ -402,6 +405,42 @@ namespace PacketCaptureTool
 
         }
         #endregion
-  
+
+        #region DisplayData
+
+        public string GetAddressText(IPPacket ip, dynamic package)
+        {
+            bool existsPortNumber = IsTCPPacket(package) || IsUDPPacket(package);
+            var sourcePort = existsPortNumber ? $"{package.SourcePort}" : string.Empty;
+            var destinationPort = existsPortNumber ? $"{package.DestinationPort}" : string.Empty;
+
+            return $"Source: {ip.SourceAddress}:{sourcePort} -> Destination: {ip.DestinationAddress}:{destinationPort} - IP Version: {ip.Version}";
+        }
+
+        public string BooleanToString(bool isTrue, int returnStringType = 0)
+        {
+            switch (returnStringType)
+            {
+                case 0:
+                    return isTrue ? "Set" : "Not Set";
+                case 1:
+                default:
+                    return isTrue ? "valid" : "invalid";
+            }
+        }
+
+        public string GetHeader(byte[] header)
+        {
+            string headerText = "Header: ";
+            foreach (var bytes in header)
+            {
+                headerText += bytes.ToString().PadLeft(4, '0') + " ";
+            }
+
+            return headerText;
+        }
+
+        #endregion
+
     }
 }

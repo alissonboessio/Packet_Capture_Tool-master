@@ -1,4 +1,5 @@
 ﻿using PacketDotNet;
+using PacketDotNet.Lldp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,14 @@ namespace PacketCaptureTool.Objects
         public IgmpV2Packet IGMPv2Packet { get; private set; }
         public ArpPacket ARPPacket { get; private set; }
         public LldpPacket LLDPPacket { get; private set; }
+
+        // fields only applied to LLDPPackets.
+        public string ChassisId { get; }
+        public string PortId { get; }
+        public string SystemName { get; }
+        public string SystemDesc { get; }
+        public string SysCapabilities { get; }
+        public string ManagementAddress { get; }
 
         public IPPacket IpPacket { get; private set; }
 
@@ -83,6 +92,38 @@ namespace PacketCaptureTool.Objects
             this.time = time;
             LLDPPacket = lldpPacket;
             IpPacket = ipPacket;
+
+            ChassisId = "N/A";
+            PortId = "N/A";
+            SystemName = "N/A";
+            SystemDesc = "N/A";
+            SysCapabilities = "N/A";
+            ManagementAddress = "N/A";
+
+            foreach (var tlv in lldpPacket.TlvCollection)
+            {
+                switch (tlv)
+                {
+                    case ChassisIdTlv chassisIdTlv:
+                        ChassisId = chassisIdTlv.ToString();
+                        break;
+                    case PortIdTlv portIdTlv:
+                        PortId = portIdTlv.ToString();
+                        break;
+                    case SystemNameTlv systemNameTlv:
+                        SystemName = systemNameTlv.ToString();
+                        break;
+                    case SystemDescriptionTlv systemDescTlv:
+                        SystemDesc = systemDescTlv.ToString();
+                        break;
+                    case SystemCapabilitiesTlv sysCapabilitiesTlv:
+                        SysCapabilities = sysCapabilitiesTlv.ToString();
+                        break;
+                    case ManagementAddressTlv managementAddrTlv:
+                        ManagementAddress = managementAddrTlv.ToString();
+                        break;
+                }
+            }
         }
 
     }
