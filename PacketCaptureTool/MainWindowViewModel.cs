@@ -15,28 +15,44 @@ namespace PacketCaptureTool
             this.packetsOptions = new List<ValueDescOption> {
                 new(0, "ALL"),
                 new(1, "UDP", "ip and udp"),
-                new(2, "TCP", "ip and tdp"),
+                new(2, "TCP", "ip and tcp"),
                 new(3, "ICMPv4", "ip and icmp"),
                 new(4, "ICMPv6", "icmp6"),
                 new(5, "IGMPv2", "ip and igmp"),
                 new(6, "ARP", "arp"),
-                new(7, "LLDP", "lldp")
+                new(7, "LLDP", "ether proto 0x88cc")
             };
+
+            this.packetsOptions[0].check = true;
 
             this.get_Device_List();
             stopCapture = false;
+            isRunning = false;
+            AllPackets = new ObservableCollection<PackageDetail>();
         }
 
-        public ObservableCollection<PackageDetail> AllPackets { get; } = new();
-        public ObservableCollection<PackageDetail> TcpPackets => new(AllPackets.Where(p => p.TcpPacket != null));
-        public ObservableCollection<PackageDetail> UdpPackets => new(AllPackets.Where(p => p.UdpPacket != null));
-        public ObservableCollection<PackageDetail> Icmpv4Packets => new(AllPackets.Where(p => p.ICMPv4Packet != null));
+        public ObservableCollection<PackageDetail> AllPackets 
+        {
+            get => Get<ObservableCollection<PackageDetail>>();
+            set => Set(value);
+        }
+        public ObservableCollection<PackageDetail> TcpPackets { get; set; } = new();
+        public ObservableCollection<PackageDetail> UdpPackets { get; set; } = new();
+        public ObservableCollection<PackageDetail> Icmpv4Packets { get; set; } = new();
+        public ObservableCollection<PackageDetail> ICMPv6Packets { get; set; } = new();
+        public ObservableCollection<PackageDetail> IGMPPackets { get; set; } = new();
+        public ObservableCollection<PackageDetail> ARPPackets { get; set; } = new();
+        public ObservableCollection<PackageDetail> LLDPPackets { get; set; } = new();
 
 
         public List<ValueDescOption> packetsOptions
         {
             get => Get<List<ValueDescOption>>();
-            set => Set(value);
+            set
+            {
+                Set(value);
+                OnPropertyChanged(nameof(isStartEnabled));
+            }
         }
 
         public CaptureDeviceList? devices
@@ -47,7 +63,11 @@ namespace PacketCaptureTool
         public ICaptureDevice? selectedDevice
         {
             get => Get<ICaptureDevice>();
-            set => Set(value);
+            set
+            {
+                Set(value);
+                OnPropertyChanged(nameof(isStartEnabled));
+            }
         }
 
         public bool promiscuosMode
@@ -60,6 +80,47 @@ namespace PacketCaptureTool
             get => Get<bool>();
             set => Set(value);
         }
+        public bool isRunning
+        {
+            get => Get<bool>();
+            set 
+            {
+                Set(value);
+                OnPropertyChanged(nameof(isStartEnabled));
+            } 
+        }
+        public bool isStartEnabled
+        {
+            get => !isRunning && selectedDevice != null && packetsOptions.Any(opt => opt.check);
+        }
+
+        private readonly List<PackageDetail> _buffer = new();
+        private readonly object _bufferLock = new();
+
+        private void StartBufferTimer()
+        {
+            var timer = new System.Timers.Timer(300); // A cada 300ms
+            timer.Elapsed += (s, e) =>
+            {
+                List<PackageDetail> packetsToAdd;
+
+                lock (_bufferLock)
+                {
+                    if (_buffer.Count == 0) return;
+                    packetsToAdd = new List<PackageDetail>(_buffer);
+                    _buffer.Clear();
+                }
+
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    foreach (var packet in packetsToAdd)
+                    {
+                        AddPacket(packet);
+                    }
+                });
+            };
+            timer.Start();
+        }
 
         public void StartCapture()
         {
@@ -69,6 +130,30 @@ namespace PacketCaptureTool
             };
 
             l.Start();
+            isRunning = true;
+            StartBufferTimer();
+        }
+        public void StopCapture()
+        {
+            stopCapture = true;
+            isRunning = false;
+        }
+        
+        public void CleanList()
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() => 
+            {
+                AllPackets.Clear();
+                TcpPackets.Clear();
+                UdpPackets.Clear();
+                Icmpv4Packets.Clear();
+                ICMPv6Packets.Clear();
+                IGMPPackets.Clear();
+                ARPPackets.Clear();
+                LLDPPackets.Clear();
+
+                PackageDetail.ResetId();
+            });
         }
 
         private void get_Device_List()
@@ -130,41 +215,88 @@ namespace PacketCaptureTool
             stopCapture = false;
         }
 
+        public void AddPacket(PackageDetail packet)
+        {
+            if (System.Windows.Application.Current.Dispatcher.CheckAccess())
+            {
+                AllPackets.Add(packet);
+
+                if (packet.TcpPacket != null)
+                    TcpPackets.Add(packet);
+                else if (packet.UdpPacket != null)
+                    UdpPackets.Add(packet);
+                else if (packet.ICMPv4Packet != null)
+                    Icmpv4Packets.Add(packet);
+                else if (packet.ICMPv6Packet != null)
+                    ICMPv6Packets.Add(packet);
+                else if (packet.IGMPv2Packet != null)
+                    IGMPPackets.Add(packet);
+                else if (packet.ARPPacket != null)
+                    ARPPackets.Add(packet);
+                else if (packet.LLDPPacket != null)
+                    LLDPPackets.Add(packet);
+            }
+            else
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    AllPackets.Add(packet);
+
+                    if (packet.TcpPacket != null)
+                        TcpPackets.Add(packet);
+                    else if (packet.UdpPacket != null)
+                        UdpPackets.Add(packet);
+                    else if (packet.ICMPv4Packet != null)
+                        Icmpv4Packets.Add(packet);
+                    else if (packet.ICMPv6Packet != null)
+                        ICMPv6Packets.Add(packet);
+                    else if (packet.IGMPv2Packet != null)
+                        IGMPPackets.Add(packet);
+                    else if (packet.ARPPacket != null)
+                        ARPPackets.Add(packet);
+                    else if (packet.LLDPPacket != null)
+                        LLDPPackets.Add(packet);
+                });
+            }
+        }
+
+
         private void device_OnPacketArrival(object sender, PacketCapture packet)
         {
             Packet pack = Packet.ParsePacket(packet.GetPacket().LinkLayerType, packet.Data.ToArray());
-            DateTime time = packet.GetPacket().Timeval.Date;
+            DateTime time = packet.GetPacket().Timeval.Date.AddHours(-3);
             int len = packet.Data.Length;
 
             if (IsTCPPacket(pack))
             {
                 ShowTCPPacket(pack, time, len);
             }
-            //else if (IsUDPPacket(pack))
-            //{
-            //    ShowUDPPacket(pack, time, len);
-            //}
-            //else if (IsIcmpV4Packet(pack))
-            //{
-            //    ShowIcmpV4Packet(pack, time, len);
-            //}
-            //else if (IsICMPv6Packet(pack))
-            //{
-            //    ShowICMPv6Packet(pack, time, len);
-            //}
-            //else if (IsIGMPv2Packet(pack))
-            //{
-            //    ShowIGMPv2Packet(pack, time, len);
-            //}
-            //else if (IsArpPacket(pack))
-            //{
-            //    ShowArpPacket(pack, time, len);
-            //}
-            //else if (IsLldpPacket(pack))
-            //{
-            //    ShowLldpPacket(pack, time, len);
-            //}
-        }
+            else if (IsUDPPacket(pack))
+            {
+                ShowUDPPacket(pack, time, len);
+            }
+            else if (IsIcmpV4Packet(pack))
+            {
+                ShowIcmpV4Packet(pack, time, len);
+            }
+            else if (IsICMPv6Packet(pack))
+            {
+                ShowICMPv6Packet(pack, time, len);
+            }
+            else if (IsIGMPv2Packet(pack))
+            {
+                ShowIGMPv2Packet(pack, time, len);
+            }
+            else if (IsArpPacket(pack))
+            {
+                ShowArpPacket(pack, time, len);
+            }
+            else if (IsLldpPacket(pack))
+            {
+                ShowLldpPacket(pack, time, len);
+            }
+
+        }        
 
         #region TCP
         public bool IsTCPPacket(Packet pack) => pack.Extract<TcpPacket>() != null;
@@ -172,17 +304,104 @@ namespace PacketCaptureTool
         {
             var tcpPacket = pack.Extract<TcpPacket>();
             IPPacket ipPacket = (IPPacket)tcpPacket.ParentPacket;
-            AllPackets.Add(new PackageDetail(tcpPacket, null, ipPacket));
 
-            //var srcIp = ipPacket.SourceAddress;
-            //var dstIp = ipPacket.DestinationAddress;
-            //var srcPort = tcpPacket.SourcePort;
-            //var dstPort = tcpPacket.DestinationPort;
-            //writeLine = string.Format("ID: {9} - {0}:{1}:{2},{3} - TCP Packet: {5}:{6}  -> {7}:{8}\n\n",
-            //                    time.Hour, time.Minute, time.Second, time.Millisecond, len,
-            //                    srcIp, srcPort, dstIp, dstPort, packageDetail.Id);
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(tcpPacket, ipPacket, time));
+            }
+
         }
         #endregion
 
+        #region UDP
+        public bool IsUDPPacket(Packet pack) => pack.Extract<UdpPacket>() != null;
+        private void ShowUDPPacket(Packet pack, DateTime time, int len)
+        {
+            var udpPacket = pack.Extract<UdpPacket>();
+            IPPacket ipPacket = (IPPacket)udpPacket.ParentPacket;
+
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(udpPacket, ipPacket, time));
+            }
+
+        }
+        #endregion
+
+        #region ICMPv4
+        public bool IsIcmpV4Packet(Packet pack) => pack.Extract<IcmpV4Packet>() != null;
+        private void ShowIcmpV4Packet(Packet pack, DateTime time, int len)
+        {
+            var icmpv4Packet = pack.Extract<IcmpV4Packet>();
+            IPPacket ipPacket = (IPPacket)icmpv4Packet.ParentPacket;
+
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(icmpv4Packet, ipPacket, time));
+            }
+
+        }
+        #endregion
+
+        #region ICMPv6
+        public bool IsICMPv6Packet(Packet pack) => pack.Extract<IcmpV6Packet>() != null;
+        private void ShowICMPv6Packet(Packet pack, DateTime time, int len)
+        {
+            var icmpv6Packet = pack.Extract<IcmpV6Packet>();
+            IPPacket ipPacket = (IPPacket)icmpv6Packet.ParentPacket;
+
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(icmpv6Packet, ipPacket, time));
+            }
+
+        }
+        #endregion
+
+        #region IGMP
+        public bool IsIGMPv2Packet(Packet pack) => pack.Extract<IgmpV2Packet>() != null;
+        private void ShowIGMPv2Packet(Packet pack, DateTime time, int len)
+        {
+            var igmpv2Packet = pack.Extract<IgmpV2Packet>();
+            IPPacket ipPacket = (IPPacket)igmpv2Packet.ParentPacket;
+
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(igmpv2Packet, ipPacket, time));
+            }
+
+        }
+        #endregion
+
+        #region ARP
+        public bool IsArpPacket(Packet pack) => pack.Extract<ArpPacket>() != null;
+
+        private void ShowArpPacket(Packet pack, DateTime time, int len)
+        {
+            var arpPacket = pack.Extract<ArpPacket>();
+
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(arpPacket, null, time));
+            }
+
+        }
+        #endregion
+
+        #region region LLDP
+        public bool IsLldpPacket(Packet pack) => pack.Extract<LldpPacket>() != null;
+
+        private void ShowLldpPacket(Packet pack, DateTime time, int len)
+        {
+            var lldpPacket = pack.Extract<LldpPacket>();
+
+            lock (_bufferLock)
+            {
+                _buffer.Add(new PackageDetail(lldpPacket, null, time));
+            }
+
+        }
+        #endregion
+  
     }
 }

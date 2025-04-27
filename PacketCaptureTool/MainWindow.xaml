@@ -4,30 +4,40 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PacketCaptureTool"
+        xmlns:local1="clr-namespace:PacketCaptureTool.Objects.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel, IsDesignTimeCreatable=True}"
-        Title="Packet Capture Tool" Height="450" Width="800">
+        Title="Packet Capture Tool" Height="450" Width="820" MinWidth="820">
+    <Window.Resources>
+        <local1:BooleanInverterConverter x:Key="BooleanInverterConverter" />
+    </Window.Resources>
     <Grid x:Name="painel">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0"
+        <Grid Grid.Column="0"
                     Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition />
+                <RowDefinition Height="120"/>
+            </Grid.RowDefinitions>
             
-            <StackPanel>
+            <StackPanel Grid.Row="0">
                 <Label>Choose device to capture:</Label>
                 <ComboBox ItemsSource="{Binding devices}"
                     SelectedItem="{Binding selectedDevice, Mode=TwoWay}"
                     DisplayMemberPath="Description"
-                    Margin="10" >
+                    IsEnabled="{Binding isRunning, Converter={StaticResource BooleanInverterConverter}}"
+                    Margin="0,10">
                 </ComboBox>
 
                 <CheckBox Margin="0,5,0,0"
                           IsChecked="{Binding promiscuosMode}">Promiscuous mode</CheckBox>
             </StackPanel>
 
-            <StackPanel>
+            <StackPanel Grid.Row="1">
 
                 <Label>Packets:</Label>
                 <ItemsControl ItemsSource="{Binding packetsOptions}">
@@ -54,46 +64,260 @@
 
             </StackPanel>
 
-            <Button Margin="0,10,0,0"
-                    Click="Button_Click">
-                Start Capture
-            </Button>
-            
-            
-        </StackPanel>
+            <StackPanel Grid.Row="2"
+                        VerticalAlignment="Bottom">            
+                <Button x:Name="BTStartCapture"
+                        Style="{StaticResource ButtonMain}"
+                        Height="30"
+                        Margin="0,5,0,0"
+                        Click="BTStartCapture_Click"
+                        IsEnabled="{Binding isStartEnabled}">
+                    Start Capture
+                </Button>
+
+                <Button x:Name="BTStopCapture"
+                        Style="{StaticResource ButtonMain}"
+                        Height="30"
+                        Margin="0,5,0,0"
+                        Click="BTStopCapture_Click"
+                        IsEnabled="{Binding isRunning}">
+                    Stop Capture
+                </Button>
+
+                <Button x:Name="BTCleanList"
+                        Style="{StaticResource ButtonMain}"
+                        Height="30"
+                        Margin="0,5,0,0"
+                        Click="BTCleanList_Click"
+                        IsEnabled="{Binding isRunning, Converter={StaticResource BooleanInverterConverter}}">
+                    Clean List
+                </Button>
+
+            </StackPanel>
+
+        </Grid>
         
         <TabControl Grid.Column="1">
             <TabItem Header="TCP">
-                <ListView ItemsSource="{Binding TcpPackets}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Src Port" DisplayMemberBinding="{Binding TcpPacket.SourcePort}" />
-                            <GridViewColumn Header="Dst Port" DisplayMemberBinding="{Binding TcpPacket.DestinationPort}" />
-                            <!-- Add more columns -->
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVTCP" MouseDoubleClick="LVTCP_MouseDoubleClick" ItemsSource="{Binding TcpPackets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
+                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
+                                <GridViewColumn Width="70" Header="Source Port" DisplayMemberBinding="{Binding TcpPacket.SourcePort}" />
+                                <GridViewColumn Width="70" Header="Destiny Port" DisplayMemberBinding="{Binding TcpPacket.DestinationPort}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                               HorizontalAlignment="Right"
+                               Text="{Binding TcpPackets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
+                               
             </TabItem>
 
             <TabItem Header="UDP">
-                <ListView ItemsSource="{Binding UdpPackets}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Src Port" DisplayMemberBinding="{Binding UdpPacket.SourcePort}" />
-                            <GridViewColumn Header="Dst Port" DisplayMemberBinding="{Binding UdpPacket.DestinationPort}" />
-                            <!-- Add more columns -->
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVUDP" MouseDoubleClick="LVUDP_MouseDoubleClick" ItemsSource="{Binding UdpPackets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
+                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
+                                <GridViewColumn Width="70" Header="Source Port" DisplayMemberBinding="{Binding UdpPacket.SourcePort}" />
+                                <GridViewColumn Width="70" Header="Destiny Port" DisplayMemberBinding="{Binding UdpPacket.DestinationPort}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                       HorizontalAlignment="Right"
+                       Text="{Binding UdpPackets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
             </TabItem>
 
             <TabItem Header="ICMPv4">
-                <ListView ItemsSource="{Binding Icmpv4Packets}">
-                    <!-- ICMP columns here -->
-                </ListView>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVICMPv4" MouseDoubleClick="LVICMPv4_MouseDoubleClick" ItemsSource="{Binding Icmpv4Packets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
+                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                           HorizontalAlignment="Right"
+                           Text="{Binding Icmpv4Packets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
             </TabItem>
 
-            <!-- Repeat for ICMPv6, ARP, IGMPv2, LLDP -->
+            <TabItem Header="ICMPv6">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVICMPv6" MouseDoubleClick="LVICMPv6_MouseDoubleClick" ItemsSource="{Binding ICMPv6Packets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
+                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                           HorizontalAlignment="Right"
+                           Text="{Binding ICMPv6Packets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="IGMP">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVIGMP" MouseDoubleClick="LVIGMP_MouseDoubleClick" ItemsSource="{Binding IGMPPackets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
+                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                           HorizontalAlignment="Right"
+                           Text="{Binding IGMPPackets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="ARP">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVARP" MouseDoubleClick="LVARP_MouseDoubleClick" ItemsSource="{Binding ARPPackets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <GridViewColumn Width="70" Header="ARP. Oper." DisplayMemberBinding="{Binding ARPPacket.Operation}" />
+                                <GridViewColumn Width="100" Header="Sender MAC" DisplayMemberBinding="{Binding ARPPacket.SenderHardwareAddress}" />
+                                <GridViewColumn Width="90" Header="Sender IP" DisplayMemberBinding="{Binding ARPPacket.SenderProtocolAddress}" />
+                                <GridViewColumn Width="100" Header="Target MAC" DisplayMemberBinding="{Binding ARPPacket.TargetHardwareAddress}" />
+                                <GridViewColumn Width="90" Header="Target IP" DisplayMemberBinding="{Binding ARPPacket.TargetProtocolAddress}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                           HorizontalAlignment="Right"
+                           Text="{Binding ARPPackets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="LLDP">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="LVLLDP" MouseDoubleClick="LVLLDP_MouseDoubleClick" ItemsSource="{Binding LLDPPackets}" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="auto" Header="ID" DisplayMemberBinding="{Binding LLDPPacket.TlvCollection}" />
+                                <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
+                                <!--<GridViewColumn Width="130" Header="Source IP" DisplayMemberBinding="{Binding IpPacket.SourceAddress}" />
+                                <GridViewColumn Width="130" Header="Destiny IP" DisplayMemberBinding="{Binding IpPacket.DestinationAddress}" />
+                                <GridViewColumn Width="70" Header="Source Port" DisplayMemberBinding="{Binding TcpPacket.SourcePort}" />
+                                <GridViewColumn Width="70" Header="Destiny Port" DisplayMemberBinding="{Binding TcpPacket.DestinationPort}" />-->
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <TextBlock Grid.Row="1" 
+                           HorizontalAlignment="Right"
+                           Text="{Binding LLDPPackets.Count, StringFormat=Total: {0}}"/>
+                </Grid>
+            </TabItem>
+
         </TabControl>
     </Grid>
 </Window>
