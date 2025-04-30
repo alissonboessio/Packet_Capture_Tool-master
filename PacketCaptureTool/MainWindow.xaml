@@ -25,7 +25,7 @@
             </Grid.RowDefinitions>
             
             <StackPanel Grid.Row="0">
-                <Label>Choose device to capture:</Label>
+                <Label>Choose a device to capture:</Label>
                 <ComboBox ItemsSource="{Binding devices}"
                     SelectedItem="{Binding selectedDevice, Mode=TwoWay}"
                     DisplayMemberPath="Description"
@@ -305,12 +305,13 @@
                             <GridView>
                                 <GridViewColumn Width="50" Header="ID" DisplayMemberBinding="{Binding Id}" />
                                 <GridViewColumn Width="80" Header="Time" DisplayMemberBinding="{Binding time, StringFormat={}{0:HH:mm:ss.fff}}" />
-                                <GridViewColumn Width="80" Header="Chassis ID" DisplayMemberBinding="{Binding ChassisId}" />
-                                <GridViewColumn Width="100" Header="Port ID" DisplayMemberBinding="{Binding PortId}" />
+                                <GridViewColumn Width="180" Header="Chassis ID" DisplayMemberBinding="{Binding ChassisId}" />
+                                <GridViewColumn Width="180" Header="Port ID" DisplayMemberBinding="{Binding PortId}" />
+                                <GridViewColumn Width="120" Header="TTL" DisplayMemberBinding="{Binding TimeToLive}" />
                                 <GridViewColumn Width="100" Header="System Name" DisplayMemberBinding="{Binding SystemName}" />
                                 <GridViewColumn Width="100" Header="Description" DisplayMemberBinding="{Binding SystemDesc}" />
                                 <GridViewColumn Width="100" Header="Capabilities" DisplayMemberBinding="{Binding SysCapabilities}" />
-                                <GridViewColumn Width="100" Header="Management Address" DisplayMemberBinding="{Binding ManagementAddress}" />
+                                <GridViewColumn Width="150" Header="Management Address" DisplayMemberBinding="{Binding ManagementAddress}" />
                             </GridView>
                         </ListView.View>
                     </ListView>

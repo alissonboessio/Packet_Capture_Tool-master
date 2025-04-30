@@ -277,12 +277,13 @@ namespace PacketCaptureTool
 
                 mainPanel.Children.Add(new TextBlock { Text = $"Chassis ID: {selectedPacket.ChassisId}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
                 mainPanel.Children.Add(new TextBlock { Text = $"Port ID: {selectedPacket.PortId}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
+                mainPanel.Children.Add(new TextBlock { Text = $"TTL: {selectedPacket.TimeToLive}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
                 mainPanel.Children.Add(new TextBlock { Text = $"System Name: {selectedPacket.SystemName}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
                 mainPanel.Children.Add(new TextBlock { Text = $"System Description: {selectedPacket.SystemDesc}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
                 mainPanel.Children.Add(new TextBlock { Text = $"System Capabilities: {selectedPacket.SysCapabilities}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
                 mainPanel.Children.Add(new TextBlock { Text = $"Management Address: {selectedPacket.ManagementAddress}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
 
-                var detailWindow = new PacketDetailWindow("LLDP Packet", mainPanel, null);
+                var detailWindow = new PacketDetailWindow("LLDP Packet", mainPanel, new TextBlock { Text = selectedPacket.Other });
                 detailWindow.Show();
             }
         }

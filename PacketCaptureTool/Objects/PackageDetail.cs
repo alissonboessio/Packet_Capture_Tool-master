@@ -28,6 +28,8 @@ namespace PacketCaptureTool.Objects
         public string SystemDesc { get; }
         public string SysCapabilities { get; }
         public string ManagementAddress { get; }
+        public string TimeToLive { get; }
+        public string Other{ get; }
 
         public IPPacket IpPacket { get; private set; }
 
@@ -98,29 +100,40 @@ namespace PacketCaptureTool.Objects
             SystemName = "N/A";
             SystemDesc = "N/A";
             SysCapabilities = "N/A";
-            ManagementAddress = "N/A";
+            ManagementAddress = "N/A";                     
+            TimeToLive = "N/A";                     
+            Other = "";                     
 
             foreach (var tlv in lldpPacket.TlvCollection)
             {
                 switch (tlv)
                 {
                     case ChassisIdTlv chassisIdTlv:
-                        ChassisId = chassisIdTlv.ToString();
+                        ChassisId = $"{chassisIdTlv.SubType}: {chassisIdTlv.SubTypeValue}";
                         break;
                     case PortIdTlv portIdTlv:
-                        PortId = portIdTlv.ToString();
+                        PortId = $"{portIdTlv.SubType}: {portIdTlv.SubTypeValue}";
                         break;
                     case SystemNameTlv systemNameTlv:
-                        SystemName = systemNameTlv.ToString();
+                        SystemName = $"{systemNameTlv.Name}: {systemNameTlv.Value}";
                         break;
                     case SystemDescriptionTlv systemDescTlv:
-                        SystemDesc = systemDescTlv.ToString();
+                        SystemDesc = $"{systemDescTlv.Description}: {systemDescTlv.Value}";
                         break;
                     case SystemCapabilitiesTlv sysCapabilitiesTlv:
-                        SysCapabilities = sysCapabilitiesTlv.ToString();
+                        SysCapabilities = $"{sysCapabilitiesTlv.Type}: {sysCapabilitiesTlv.Capabilities}";
                         break;
                     case ManagementAddressTlv managementAddrTlv:
                         ManagementAddress = managementAddrTlv.ToString();
+                        break;
+                    case TimeToLiveTlv timeToLiveTlv:
+                        TimeToLive = $"{timeToLiveTlv.Type}: {timeToLiveTlv.Seconds}s";
+                        break;
+                    case EndOfLldpduTlv endOfLldpdu:
+                        var b = endOfLldpdu;
+                        break;
+                    default:
+                        Other += tlv.ToString() + "\n";
                         break;
                 }
             }
