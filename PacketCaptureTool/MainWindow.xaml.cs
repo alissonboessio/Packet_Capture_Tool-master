@@ -283,7 +283,7 @@ namespace PacketCaptureTool
                 mainPanel.Children.Add(new TextBlock { Text = $"System Capabilities: {selectedPacket.SysCapabilities}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
                 mainPanel.Children.Add(new TextBlock { Text = $"Management Address: {selectedPacket.ManagementAddress}", FontSize = 14, TextWrapping = TextWrapping.Wrap });
 
-                var detailWindow = new PacketDetailWindow("LLDP Packet", mainPanel, new TextBlock { Text = selectedPacket.Other });
+                var detailWindow = new PacketDetailWindow("LLDP Packet", mainPanel, new TextBlock { Text = $"Other\n\n{selectedPacket.Other}", TextWrapping = TextWrapping.Wrap });
                 detailWindow.Show();
             }
         }
